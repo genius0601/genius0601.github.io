@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genius - PHP Program Engineer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            color: #333333;
+        }
+        header {
+            background-color: #007acc;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #005b99;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        nav a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        nav a:hover {
+            background-color: #003f66;
+        }
+        .container {
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .container h2 {
+            color: #007acc;
+        }
+        .container p {
+            line-height: 1.6;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background-color: #f0f0f0;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        ul li:hover {
+            background-color: #e0e0e0;
+        }
+        footer {
+            background-color: #005b99;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            position: relative;
+            width: 100%;
+            bottom: 0;
+        }
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+            }
+            nav a {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Genius</h1>
+        <p>PHP Program Engineer</p>
+    </header>
+    <nav>
+        <a href="#home">Home</a>
+        <a href="#about">About Me</a>
+        <a href="#code">My Code</a>
+        <a href="#life">Life and Hopes</a>
+        <a href="#contact">Contact</a>
+    </nav>
+    <div class="container" id="home">
+        <h2>Welcome to My Personal Page</h2>
+        <p>Hello! I'm Genius, a passionate PHP program engineer. Welcome to my personal webpage where I share my code and insights into my life. I hope you find it informative and inspiring.</p>
+    </div>
+    <div class="container" id="about">
+        <h2>About Me</h2>
+        <p>I'm a PHP program engineer with a deep love for coding and problem-solving. With years of experience in developing efficient and scalable web applications, I aim to continuously improve and share my knowledge with others.</p>
+    </div>
+    <div class="container" id="code">
+        <h2>My Code</h2>
+        <p>Below are some of my favorite projects:</p>
+        <ul>
+            <li><a href="#">Project 1</a> - Description of Project 1.</li>
+            <li><a href="#">Project 2</a> - Description of Project 2.</li>
+            <li><a href="#">Project 3</a> - Description of Project 3.</li>
+        </ul>
+    </div>
+    <div class="container" id="life">
+        <h2>Life and Hopes</h2>
+        <p>Beyond coding, I enjoy exploring new places, reading books, and spending time with loved ones. I hope to inspire others to pursue their passions and make a positive impact in the world.</p>
+    </div>
+    <div class="container" id="contact">
+        <h2>Contact</h2>
+        <p>If you'd like to get in touch, feel free to email me at <a href="mailto:genius@example.com">genius@example.com</a>.</p>
+    </div>
+    <footer>
+        <p>&copy; 2024 Genius. All rights reserved.</p>
+    </footer>
+</body>
+</html>
