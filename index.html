@@ -1,123 +1,1256 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genius - PHP Program Engineer</title>
+    <title>个人任务排期工具（支持补班）</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #ffffff;
-            color: #333333;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
         }
-        header {
-            background-color: #007acc;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        nav {
-            display: flex;
-            justify-content: center;
-            background-color: #005b99;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        nav a {
-            color: white;
-            padding: 14px 20px;
-            text-decoration: none;
-            text-align: center;
-            transition: background-color 0.3s ease;
-        }
-        nav a:hover {
-            background-color: #003f66;
-        }
-        .container {
-            padding: 40px 20px;
-            max-width: 1200px;
-            margin: auto;
-        }
-        .container h2 {
-            color: #007acc;
-        }
-        .container p {
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
             line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
         }
-        ul li {
-            background-color: #f0f0f0;
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-        ul li:hover {
-            background-color: #e0e0e0;
-        }
-        footer {
-            background-color: #005b99;
-            color: white;
+        
+        header {
             text-align: center;
             padding: 20px 0;
-            position: relative;
-            width: 100%;
-            bottom: 0;
+            border-bottom: 2px solid #4a6fa5;
+            margin-bottom: 10px;
         }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 16px;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        
+        h2 {
+            color: #3498db;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, textarea, button {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: monospace;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .split-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+        }
+        
+        .split-layout > .card {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .time-input {
+            max-width: 250px;
+        }
+        
+        .result-section {
+            display: none;
+        }
+        
+        .result-section.active {
+            display: block;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .alert.warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+        
+        .alert.info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .task-name {
+            font-weight: 600;
+        }
+        
+        .time-cell {
+            font-family: monospace;
+            color: #2c3e50;
+        }
+        
+        .duration-cell {
+            text-align: center;
+        }
+        
+        .weekend {
+            background-color: #f8f9fa;
+            color: #95a5a6;
+        }
+        
+        .overnight {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .work-hours {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        .total-days {
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .tasks-count {
+            color: #9b59b6;
+            font-weight: 600;
+        }
+        
+        .example-btn {
+            background-color: #f8f9fa;
+            color: #7f8c8d;
+            border: 1px solid #ddd;
+            margin-top: 5px;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .example-btn:hover {
+            background-color: #e9ecef;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px 0;
+            color: #7f8c8d;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        /* JSON输入框高亮样式 */
+        .json-input-card {
+            border-left: 5px solid #3498db;
+            background-color: #f8fbfe;
+        }
+        
+        .json-input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .json-input-header h2 {
+            margin-bottom: 0;
+            border-bottom: none;
+            color: #2c3e50;
+        }
+        
+        .json-badge {
+            background-color: #3498db;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .work-time-display {
+            background-color: #e8f4fc;
+            border: 1px solid #b3dcf9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .work-time-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .time-icon {
+            font-size: 20px;
+        }
+        
+        .time-label {
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 70px;
+        }
+        
+        .time-value {
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .input-format-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .format-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 600;
+            color: #7f8c8d;
+            margin: 0;
+            width: auto;
+        }
+        
+        .format-tab.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background-color: #f8fbfe;
+        }
+        
+        .input-area {
+            display: none;
+        }
+        
+        .input-area.active {
+            display: block;
+        }
+        
+        .input-preview {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .preview-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+        
+        .preview-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e9ecef;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+        
+        .preview-task-name {
+            color: #2c3e50;
+        }
+        
+        .preview-hours {
+            color: #e74c3c;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        /* 补班日设置区域 */
+        .workday-exception-card {
+            margin-top: 20px;
+            border-top: 2px dashed #3498db;
+            padding-top: 20px;
+        }
+        
+        .exception-input {
+            font-size: 14px;
+            min-height: 80px;
+        }
+        
+        .exception-example {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
         @media (max-width: 768px) {
-            nav {
+            .split-layout {
                 flex-direction: column;
             }
-            nav a {
-                padding: 10px;
+            
+            .time-input {
+                max-width: 100%;
+            }
+            
+            .time-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .work-time-display {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Genius</h1>
-        <p>PHP Program Engineer</p>
-    </header>
-    <nav>
-        <a href="#home">Home</a>
-        <a href="#about">About Me</a>
-        <a href="#code">My Code</a>
-        <a href="#life">Life and Hopes</a>
-        <a href="#contact">Contact</a>
-    </nav>
-    <div class="container" id="home">
-        <h2>Welcome to My Personal Page</h2>
-        <p>Hello! I'm Genius, a passionate PHP program engineer. Welcome to my personal webpage where I share my code and insights into my life. I hope you find it informative and inspiring.</p>
+    <div class="container">
+        <header>
+            <h1>个人任务排期工具（支持补班）</h1>
+            <p class="subtitle">自动计算任务时间线 · 支持跨日跨段排期 · 补班日灵活配置</p>
+        </header>
+        
+        <!-- 任务输入区域 - 放在最上面 -->
+        <div class="card json-input-card">
+            <div class="json-input-header">
+                <h2>📋 任务输入</h2>
+                <span class="json-badge">必填</span>
+            </div>
+            
+            <div class="input-format-tabs">
+                <button type="button" class="format-tab active" id="tabSimple">简单输入格式</button>
+                <button type="button" class="format-tab" id="tabJSON">JSON格式</button>
+            </div>
+            
+            <!-- 简单输入格式 -->
+            <div id="simpleInputArea" class="input-area active">
+                <div class="alert info">
+                    <strong>💡 简单输入格式：</strong> 直接输入"任务名称 小时数"，支持多个空格分隔<br>
+                    <strong>示例：</strong><br>
+                    <code>新增接口-接受VCAM推送的CAM自动化任务    4</code><br>
+                    <code>梳理德邦面单对接SDK&ERP打印面单逻辑  4</code><br>
+                    <small>注意：任务名称和小时数之间可以用一个或多个空格分隔</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="simpleTasksInput">输入任务（每行格式：任务名称 小时数）</label>
+                    <textarea id="simpleTasksInput" placeholder="输入示例：
+新增接口-接受VCAM推送的CAM自动化任务    4
+梳理德邦面单对接SDK&ERP打印面单逻辑  4
+ERP打印面单公共接口德邦特殊处理  2
+德邦电子面单组装返回数据(含子母单处理)  4
+德邦电子面单打印交互页面(含子母单处理)  4
+德邦电子面单打印自测  2"></textarea>
+                </div>
+                
+                <div id="previewArea" class="input-preview" style="display: none;">
+                    <div class="preview-title">📋 解析预览：</div>
+                    <div id="previewContent"></div>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" id="loadExampleSimple" class="example-btn">📋 加载示例任务</button>
+                    <button type="button" id="previewSimple" class="example-btn">👁️ 预览解析</button>
+                    <button type="button" id="convertToJSON" class="example-btn">🔄 转换为JSON</button>
+                    <button type="button" id="clearSimpleInput" class="example-btn">🗑️ 清空输入</button>
+                </div>
+            </div>
+            
+            <!-- JSON输入格式 -->
+            <div id="jsonInputArea" class="input-area">
+                <div class="form-group">
+                    <label for="tasksInput">输入任务列表（JSON格式）</label>
+                    <textarea id="tasksInput" placeholder='例如：
+[
+  {"name": "需求分析", "hours": 3.5},
+  {"name": "UI设计", "hours": 6},
+  {"name": "前端开发", "hours": 12}
+]'></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" id="loadExampleJSON" class="example-btn">📋 加载示例任务</button>
+                    <button type="button" id="formatJson" class="example-btn">✨ 格式化JSON</button>
+                    <button type="button" id="clearJsonInput" class="example-btn">🗑️ 清空输入</button>
+                </div>
+            </div>
+            
+            <!-- 工作时间显示 -->
+            <div class="work-time-display">
+                <div class="work-time-item">
+                    <span class="time-icon">⏰</span>
+                    <span class="time-label">上午:</span>
+                    <span class="time-value">09:00 - 12:00 (3小时)</span>
+                </div>
+                <div class="work-time-item">
+                    <span class="time-icon">⏰</span>
+                    <span class="time-label">下午:</span>
+                    <span class="time-value">13:30 - 18:30 (5小时)</span>
+                </div>
+                <div class="work-time-item">
+                    <span class="time-icon">📅</span>
+                    <span class="time-label">每日:</span>
+                    <span class="time-value">共8小时</span>
+                </div>
+                <div class="work-time-item">
+                    <span class="time-icon">🚫</span>
+                    <span class="time-label">周末:</span>
+                    <span class="time-value">周六、周日默认不工作（可设置补班）</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 排期设置区域（包含补班设置） -->
+        <div class="split-layout">
+            <div class="card">
+                <h2>📅 排期开始设置</h2>
+                
+                <div class="form-group">
+                    <label for="startDate">排期开始日期</label>
+                    <input type="date" id="startDate" class="time-input">
+                </div>
+                
+                <div class="form-group">
+                    <label for="startTime">排期开始时间</label>
+                    <input type="time" id="startTime" value="09:00" class="time-input">
+                </div>
+                
+                <!-- 补班日设置 -->
+                <div class="workday-exception-card">
+                    <h3 style="font-size: 18px; margin-bottom: 15px; color: #2c3e50;">📌 补班日设置（可选）</h3>
+                    <div class="form-group">
+                        <label for="workdayExceptions">输入补班日期（YYYY-MM-DD），每行一个</label>
+                        <textarea id="workdayExceptions" class="exception-input" placeholder="例如：
+2026-02-28
+2026-03-01"></textarea>
+                        <div class="exception-example">
+                            💡 补班日将视为工作日，按照正常工作时间排期。留空则仅周一至周五工作。
+                        </div>
+                    </div>
+                    <button type="button" id="loadExampleExceptions" class="example-btn">📋 加载示例补班日</button>
+                </div>
+                
+                <div class="alert info" style="margin-top: 20px;">
+                    <strong>💡 使用提示：</strong><br>
+                    1. 系统会自动跳过非工作日（周末且非补班）<br>
+                    2. 任务会按顺序依次排期<br>
+                    3. 长任务会自动分割到不同时间段
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>⚡ 开始计算</h2>
+                
+                <div class="alert warning" style="margin-bottom: 20px;">
+                    <strong>注意：</strong> 请确保已输入有效的任务列表
+                </div>
+                
+                <button type="button" id="calculateBtn" style="font-size: 18px; padding: 15px;">
+                    🚀 开始计算排期
+                </button>
+                
+                <div class="alert info" style="margin-top: 20px;">
+                    <strong>说明：</strong> 计算结果仅供参考，实际执行请根据情况调整。
+                </div>
+            </div>
+        </div>
+        
+        <!-- 结果区域 -->
+        <div class="result-section" id="resultSection">
+            <div class="card">
+                <h2>📊 排期总表 (任务概览)</h2>
+                
+                <div id="warningAlert" class="alert warning" style="display: none;">
+                    <strong>⚠️ 注意：</strong> 以下任务需要跨日完成，请注意时间安排
+                </div>
+                
+                <table id="summaryTable">
+                    <thead>
+                        <tr>
+                            <th width="25%">任务名称</th>
+                            <th width="25%">开始时间</th>
+                            <th width="25%">结束时间</th>
+                            <th width="15%">耗时(小时)</th>
+                            <th width="10%">状态</th>
+                        </tr>
+                    </thead>
+                    <tbody id="summaryTableBody">
+                        <!-- 动态生成 -->
+                    </tbody>
+                </table>
+                
+                <div id="timeInfo" class="time-info">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>🔍 排期拆分表 (详细时间分配)</h2>
+                
+                <table id="detailTable">
+                    <thead>
+                        <tr>
+                            <th width="25%">任务名称</th>
+                            <th width="20%">日期</th>
+                            <th width="20%">时间段</th>
+                            <th width="20%">时间范围</th>
+                            <th width="15%">用时(小时)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailTableBody">
+                        <!-- 动态生成 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <footer>
+            <p>任务排期工具 v2.0 | 支持补班日配置 | 工作时间：周一至周五 09:00-12:00, 13:30-18:30（补班日同）</p>
+        </footer>
     </div>
-    <div class="container" id="about">
-        <h2>About Me</h2>
-        <p>I'm a PHP program engineer with a deep love for coding and problem-solving. With years of experience in developing efficient and scalable web applications, I aim to continuously improve and share my knowledge with others.</p>
-    </div>
-    <div class="container" id="code">
-        <h2>My Code</h2>
-        <p>Below are some of my favorite projects:</p>
-        <ul>
-            <li><a href="#">Project 1</a> - Description of Project 1.</li>
-            <li><a href="#">Project 2</a> - Description of Project 2.</li>
-            <li><a href="#">Project 3</a> - Description of Project 3.</li>
-        </ul>
-    </div>
-    <div class="container" id="life">
-        <h2>Life and Hopes</h2>
-        <p>Beyond coding, I enjoy exploring new places, reading books, and spending time with loved ones. I hope to inspire others to pursue their passions and make a positive impact in the world.</p>
-    </div>
-    <div class="container" id="contact">
-        <h2>Contact</h2>
-        <p>If you'd like to get in touch, feel free to email me at <a href="mailto:genius@example.com">genius@example.com</a>.</p>
-    </div>
-    <footer>
-        <p>&copy; 2024 Genius. All rights reserved.</p>
-    </footer>
+
+    <script>
+        // 工作时间配置
+        const WORK_CONFIG = {
+            morningStart: 9,    // 上午开始 9:00
+            morningEnd: 12,     // 上午结束 12:00
+            afternoonStart: 13.5, // 下午开始 13:30 (13.5小时)
+            afternoonEnd: 18.5,   // 下午结束 18:30 (18.5小时)
+            dailyWorkHours: 8,   // 每天工作8小时
+            weekendDays: [0, 6]  // 周日=0, 周六=6
+        };
+        
+        // DOM元素
+        const startDateInput = document.getElementById('startDate');
+        const startTimeInput = document.getElementById('startTime');
+        const simpleTasksInput = document.getElementById('simpleTasksInput');
+        const tasksInput = document.getElementById('tasksInput');
+        const workdayExceptionsInput = document.getElementById('workdayExceptions');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const previewArea = document.getElementById('previewArea');
+        const previewContent = document.getElementById('previewContent');
+        
+        // 标签页元素
+        const tabSimple = document.getElementById('tabSimple');
+        const tabJSON = document.getElementById('tabJSON');
+        const simpleInputArea = document.getElementById('simpleInputArea');
+        const jsonInputArea = document.getElementById('jsonInputArea');
+        
+        // 简单输入格式按钮
+        const loadExampleSimpleBtn = document.getElementById('loadExampleSimple');
+        const previewSimpleBtn = document.getElementById('previewSimple');
+        const convertToJSONBtn = document.getElementById('convertToJSON');
+        const clearSimpleInputBtn = document.getElementById('clearSimpleInput');
+        
+        // JSON输入格式按钮
+        const loadExampleJSONBtn = document.getElementById('loadExampleJSON');
+        const formatJsonBtn = document.getElementById('formatJson');
+        const clearJsonInputBtn = document.getElementById('clearJsonInput');
+        
+        // 补班日按钮
+        const loadExampleExceptionsBtn = document.getElementById('loadExampleExceptions');
+        
+        // 结果区域元素
+        const resultSection = document.getElementById('resultSection');
+        const warningAlert = document.getElementById('warningAlert');
+        const summaryTableBody = document.getElementById('summaryTableBody');
+        const detailTableBody = document.getElementById('detailTableBody');
+        const timeInfo = document.getElementById('timeInfo');
+        
+        // 初始化日期为今天
+        const today = new Date();
+        startDateInput.value = today.toISOString().split('T')[0];
+        
+        // 示例任务数据（简单格式）
+        const exampleSimpleTasks = `新增接口-接受VCAM推送的CAM自动化任务    4
+梳理德邦面单对接SDK&ERP打印面单逻辑  4
+ERP打印面单公共接口德邦特殊处理  2
+德邦电子面单组装返回数据(含子母单处理)  4
+德邦电子面单打印交互页面(含子母单处理)  4
+德邦电子面单打印自测  2`;
+        
+        // 示例任务数据（JSON格式）
+        const exampleJSONTasks = [
+            {"name": "新增接口-接受VCAM推送的CAM自动化任务", "hours": 4},
+            {"name": "梳理德邦面单对接SDK&ERP打印面单逻辑", "hours": 4},
+            {"name": "ERP打印面单公共接口德邦特殊处理", "hours": 2},
+            {"name": "德邦电子面单组装返回数据(含子母单处理)", "hours": 4},
+            {"name": "德邦电子面单打印交互页面(含子母单处理)", "hours": 4},
+            {"name": "德邦电子面单打印自测", "hours": 2}
+        ];
+        
+        // 示例补班日
+        const exampleExceptions = `2026-02-28
+2026-03-01`;
+        
+        // 全局补班日数组（每次计算时更新）
+        let workdayExceptions = [];
+        
+        // 标签页切换
+        tabSimple.addEventListener('click', function() {
+            tabSimple.classList.add('active');
+            tabJSON.classList.remove('active');
+            simpleInputArea.classList.add('active');
+            jsonInputArea.classList.remove('active');
+            previewArea.style.display = 'none';
+        });
+        
+        tabJSON.addEventListener('click', function() {
+            tabJSON.classList.add('active');
+            tabSimple.classList.remove('active');
+            jsonInputArea.classList.add('active');
+            simpleInputArea.classList.remove('active');
+            previewArea.style.display = 'none';
+        });
+        
+        // 加载示例任务（简单格式）
+        loadExampleSimpleBtn.addEventListener('click', function() {
+            simpleTasksInput.value = exampleSimpleTasks;
+            simpleTasksInput.focus();
+            previewArea.style.display = 'none';
+        });
+        
+        // 预览解析结果
+        previewSimpleBtn.addEventListener('click', function() {
+            try {
+                const tasks = parseSimpleFormat(simpleTasksInput.value);
+                displayPreview(tasks);
+                previewArea.style.display = 'block';
+            } catch (error) {
+                alert('解析失败: ' + error.message);
+                previewArea.style.display = 'none';
+            }
+        });
+        
+        // 转换为JSON
+        convertToJSONBtn.addEventListener('click', function() {
+            try {
+                const tasks = parseSimpleFormat(simpleTasksInput.value);
+                tasksInput.value = JSON.stringify(tasks, null, 2);
+                // 切换到JSON标签页
+                tabJSON.click();
+                tasksInput.focus();
+                previewArea.style.display = 'none';
+            } catch (error) {
+                alert('转换失败: ' + error.message);
+            }
+        });
+        
+        // 清空简单输入
+        clearSimpleInputBtn.addEventListener('click', function() {
+            if (confirm('确定要清空任务输入吗？')) {
+                simpleTasksInput.value = '';
+                simpleTasksInput.focus();
+                previewArea.style.display = 'none';
+            }
+        });
+        
+        // 加载示例任务（JSON格式）
+        loadExampleJSONBtn.addEventListener('click', function() {
+            tasksInput.value = JSON.stringify(exampleJSONTasks, null, 2);
+            tasksInput.focus();
+        });
+        
+        // 格式化JSON
+        formatJsonBtn.addEventListener('click', function() {
+            try {
+                const json = JSON.parse(tasksInput.value);
+                tasksInput.value = JSON.stringify(json, null, 2);
+            } catch (error) {
+                alert('JSON格式错误，无法格式化: ' + error.message);
+            }
+        });
+        
+        // 清空JSON输入
+        clearJsonInputBtn.addEventListener('click', function() {
+            if (confirm('确定要清空任务输入吗？')) {
+                tasksInput.value = '';
+                tasksInput.focus();
+            }
+        });
+        
+        // 加载示例补班日
+        loadExampleExceptionsBtn.addEventListener('click', function() {
+            workdayExceptionsInput.value = exampleExceptions;
+            workdayExceptionsInput.focus();
+        });
+        
+        // 解析简单格式任务
+        function parseSimpleFormat(text) {
+            const lines = text.trim().split('\n');
+            const result = [];
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+                
+                // 方法1：正则匹配
+                const regex = /^(.*[^\d\s])\s+(\d+(?:\.\d+)?)$/;
+                const match = line.match(regex);
+                
+                if (match) {
+                    const taskName = match[1].trim();
+                    const hours = parseFloat(match[2]);
+                    
+                    if (!taskName) {
+                        throw new Error(`格式错误: "${line}" - 任务名称不能为空`);
+                    }
+                    
+                    if (isNaN(hours) || hours <= 0) {
+                        throw new Error(`格式错误: "${line}" - 小时数必须是大于0的数字`);
+                    }
+                    
+                    result.push({
+                        name: taskName,
+                        hours: hours
+                    });
+                    continue;
+                }
+                
+                // 方法2：从末尾查找数字
+                let hoursStr = '';
+                let i = line.length - 1;
+                
+                while (i >= 0 && (/\d/.test(line[i]) || line[i] === '.')) {
+                    hoursStr = line[i] + hoursStr;
+                    i--;
+                }
+                
+                if (hoursStr) {
+                    while (i >= 0 && /\s/.test(line[i])) {
+                        i--;
+                    }
+                    
+                    const taskName = line.substring(0, i + 1).trim();
+                    const hours = parseFloat(hoursStr);
+                    
+                    if (!taskName) {
+                        throw new Error(`格式错误: "${line}" - 任务名称不能为空`);
+                    }
+                    
+                    if (isNaN(hours) || hours <= 0) {
+                        throw new Error(`格式错误: "${line}" - 小时数必须是大于0的数字`);
+                    }
+                    
+                    result.push({
+                        name: taskName,
+                        hours: hours
+                    });
+                } else {
+                    throw new Error(`格式错误: "${line}" - 无法解析任务名称和小时数`);
+                }
+            }
+            
+            if (result.length === 0) {
+                throw new Error('没有找到有效的任务数据');
+            }
+            
+            return result;
+        }
+        
+        // 解析补班日输入
+        function parseWorkdayExceptions(text) {
+            if (!text.trim()) return [];
+            
+            const lines = text.trim().split('\n');
+            const dates = [];
+            
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+                
+                // 简单验证格式 YYYY-MM-DD
+                const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+                if (!dateRegex.test(line)) {
+                    throw new Error(`补班日期格式错误: "${line}"，应为 YYYY-MM-DD`);
+                }
+                
+                // 验证是否为有效日期
+                const [year, month, day] = line.split('-').map(Number);
+                const date = new Date(year, month - 1, day);
+                if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+                    throw new Error(`补班日期无效: "${line}"`);
+                }
+                
+                dates.push(line);
+            }
+            
+            // 去重
+            return [...new Set(dates)];
+        }
+        
+        // 判断是否为周末（周六或周日，不考虑补班）
+        function isWeekend(date) {
+            return WORK_CONFIG.weekendDays.includes(date.getDay());
+        }
+        
+        // 判断是否为工作日（考虑补班）
+        function isWorkDay(date) {
+            const dateStr = date.toISOString().split('T')[0];
+            // 如果是补班日，则视为工作日
+            if (workdayExceptions.includes(dateStr)) {
+                return true;
+            }
+            // 否则，非周末即为工作日
+            return !isWeekend(date);
+        }
+        
+        // 显示预览
+        function displayPreview(tasks) {
+            let html = '';
+            tasks.forEach((task, index) => {
+                html += `<div class="preview-item">
+                    <span class="preview-task-name">${task.name}</span>
+                    <span class="preview-hours">${task.hours}小时</span>
+                </div>`;
+            });
+            previewContent.innerHTML = html;
+        }
+        
+        // 计算排期
+        calculateBtn.addEventListener('click', function() {
+            try {
+                let tasks;
+                
+                // 根据当前激活的标签页获取任务数据
+                if (tabSimple.classList.contains('active')) {
+                    tasks = parseSimpleFormat(simpleTasksInput.value);
+                } else {
+                    const jsonText = tasksInput.value.trim();
+                    if (!jsonText) {
+                        alert('请输入有效的任务列表');
+                        tasksInput.focus();
+                        return;
+                    }
+                    tasks = JSON.parse(jsonText);
+                }
+                
+                if (!Array.isArray(tasks) || tasks.length === 0) {
+                    alert('请输入有效的任务列表');
+                    return;
+                }
+                
+                // 验证每个任务
+                for (let i = 0; i < tasks.length; i++) {
+                    if (!tasks[i].name || tasks[i].hours === undefined) {
+                        alert(`任务 ${i+1} 缺少 name 或 hours 字段`);
+                        return;
+                    }
+                    if (tasks[i].hours <= 0) {
+                        alert(`任务 "${tasks[i].name}" 的 hours 必须大于0`);
+                        return;
+                    }
+                }
+                
+                // 解析补班日
+                try {
+                    workdayExceptions = parseWorkdayExceptions(workdayExceptionsInput.value);
+                } catch (e) {
+                    alert('补班日输入错误：' + e.message);
+                    return;
+                }
+                
+                // 获取开始时间
+                const startDate = new Date(startDateInput.value);
+                const [hours, minutes] = startTimeInput.value.split(':').map(Number);
+                startDate.setHours(hours, minutes, 0, 0);
+                
+                // 调整开始时间到最近的工作时间（考虑补班）
+                let currentTime = adjustToWorkingTime(startDate);
+                
+                // 执行排期计算
+                const { summary, details, hasOvernightTasks } = calculateSchedule(tasks, currentTime);
+                
+                // 显示结果
+                displayResults(summary, details, hasOvernightTasks);
+                
+            } catch (error) {
+                alert('输入格式错误: ' + error.message);
+                console.error(error);
+            }
+        });
+        
+        // 调整时间到最近的工作时间（考虑补班）
+        function adjustToWorkingTime(time) {
+            const date = new Date(time);
+            
+            // 如果不是工作日，跳到下一个工作日
+            while (!isWorkDay(date)) {
+                date.setDate(date.getDate() + 1);
+                date.setHours(WORK_CONFIG.morningStart, 0, 0, 0);
+            }
+            
+            // 检查是否在工作时间段内
+            const hour = date.getHours() + date.getMinutes() / 60;
+            
+            // 如果时间在午休时间 (12:00-13:30)
+            if (hour >= WORK_CONFIG.morningEnd && hour < WORK_CONFIG.afternoonStart) {
+                date.setHours(WORK_CONFIG.afternoonStart, 30, 0, 0); // 13:30
+            }
+            // 如果时间在下班后 (18:30之后)
+            else if (hour >= WORK_CONFIG.afternoonEnd) {
+                // 跳到下一天上午
+                date.setDate(date.getDate() + 1);
+                date.setHours(WORK_CONFIG.morningStart, 0, 0, 0);
+                
+                // 再次检查是否为工作日
+                while (!isWorkDay(date)) {
+                    date.setDate(date.getDate() + 1);
+                    date.setHours(WORK_CONFIG.morningStart, 0, 0, 0);
+                }
+            }
+            // 如果时间在上班前 (9:00之前)
+            else if (hour < WORK_CONFIG.morningStart) {
+                date.setHours(WORK_CONFIG.morningStart, 0, 0, 0);
+            }
+            
+            return date;
+        }
+        
+        // 获取当前时间段的剩余可用时间（小时）
+        function getCurrentSegmentRemaining(currentTime) {
+            const hour = currentTime.getHours() + currentTime.getMinutes() / 60;
+            
+            // 上午时间段
+            if (hour >= WORK_CONFIG.morningStart && hour < WORK_CONFIG.morningEnd) {
+                return WORK_CONFIG.morningEnd - hour;
+            }
+            // 下午时间段
+            else if (hour >= WORK_CONFIG.afternoonStart && hour < WORK_CONFIG.afternoonEnd) {
+                return WORK_CONFIG.afternoonEnd - hour;
+            }
+            
+            return 0;
+        }
+        
+        // 获取当前时间段的结束时间
+        function getCurrentSegmentEnd(currentTime) {
+            const date = new Date(currentTime);
+            const hour = currentTime.getHours() + currentTime.getMinutes() / 60;
+            
+            if (hour >= WORK_CONFIG.morningStart && hour < WORK_CONFIG.morningEnd) {
+                date.setHours(WORK_CONFIG.morningEnd, 0, 0, 0);
+            } else if (hour >= WORK_CONFIG.afternoonStart && hour < WORK_CONFIG.afternoonEnd) {
+                date.setHours(Math.floor(WORK_CONFIG.afternoonEnd), 30, 0, 0); // 18:30
+            }
+            
+            return date;
+        }
+        
+        // 跳到下一个工作时间段（考虑补班）
+        function jumpToNextSegment(currentTime) {
+            const date = new Date(currentTime);
+            const hour = date.getHours() + date.getMinutes() / 60;
+            
+            // 如果当前在上午，跳到下午
+            if (hour >= WORK_CONFIG.morningStart && hour < WORK_CONFIG.morningEnd) {
+                date.setHours(WORK_CONFIG.afternoonStart, 30, 0, 0); // 13:30
+                return date;
+            }
+            // 如果当前在下午或之后，跳到下一天上午
+            else {
+                date.setDate(date.getDate() + 1);
+                date.setHours(WORK_CONFIG.morningStart, 0, 0, 0);
+                
+                // 跳过非工作日
+                while (!isWorkDay(date)) {
+                    date.setDate(date.getDate() + 1);
+                    date.setHours(WORK_CONFIG.morningStart, 0, 0, 0);
+                }
+                
+                return date;
+            }
+        }
+        
+        // 计算任务排期
+        function calculateSchedule(tasks, startTime) {
+            let currentTime = new Date(startTime);
+            const summary = [];
+            const details = [];
+            let hasOvernightTasks = false;
+            
+            for (const task of tasks) {
+                let taskRemainingHours = task.hours;
+                const taskStartTime = new Date(currentTime);
+                let taskEndTime = null;
+                
+                // 记录任务开始日期
+                const taskStartDate = new Date(currentTime);
+                
+                while (taskRemainingHours > 0) {
+                    // 确保当前时间在工作时间内（考虑补班）
+                    currentTime = adjustToWorkingTime(currentTime);
+                    
+                    // 获取当前时间段的剩余时间
+                    const segmentRemaining = getCurrentSegmentRemaining(currentTime);
+                    
+                    if (segmentRemaining <= 0) {
+                        currentTime = jumpToNextSegment(currentTime);
+                        continue;
+                    }
+                    
+                    // 计算本段可使用的时间
+                    const hoursToUse = Math.min(taskRemainingHours, segmentRemaining);
+                    const segmentStart = new Date(currentTime);
+                    const segmentEnd = new Date(segmentStart.getTime() + hoursToUse * 60 * 60 * 1000);
+                    
+                    // 调整segmentEnd不要超过当前时间段结束
+                    const segmentMaxEnd = getCurrentSegmentEnd(currentTime);
+                    if (segmentEnd > segmentMaxEnd) {
+                        segmentEnd.setTime(segmentMaxEnd.getTime());
+                    }
+                    
+                    // 记录拆分详情
+                    const segmentDate = segmentStart.toISOString().split('T')[0];
+                    const period = segmentStart.getHours() < 12 ? '上午' : '下午';
+                    
+                    // 判断是否为周末（用于显示样式），但如果是补班日，则周末标记为false
+                    const isWeekendDay = isWeekend(segmentStart) && !workdayExceptions.includes(segmentDate);
+                    
+                    details.push({
+                        taskName: task.name,
+                        date: segmentDate,
+                        period: period,
+                        segmentStart: new Date(segmentStart),
+                        segmentEnd: new Date(segmentEnd),
+                        hours: hoursToUse,
+                        isWeekend: isWeekendDay  // 仅用于UI样式
+                    });
+                    
+                    // 更新当前时间和任务剩余时间
+                    currentTime = new Date(segmentEnd);
+                    taskRemainingHours -= hoursToUse;
+                    
+                    // 如果任务跨日，设置标记
+                    if (segmentStart.toDateString() !== taskStartDate.toDateString()) {
+                        hasOvernightTasks = true;
+                    }
+                }
+                
+                // 任务完成，记录总表
+                taskEndTime = new Date(currentTime);
+                summary.push({
+                    name: task.name,
+                    startTime: new Date(taskStartTime),
+                    endTime: new Date(taskEndTime),
+                    totalHours: task.hours,
+                    overnight: taskStartTime.toDateString() !== taskEndTime.toDateString()
+                });
+            }
+            
+            return { summary, details, hasOvernightTasks };
+        }
+        
+        // 格式化日期时间显示
+        function formatDateTime(date) {
+            const d = new Date(date);
+            const dateStr = d.toISOString().split('T')[0];
+            const hours = d.getHours().toString().padStart(2, '0');
+            const minutes = d.getMinutes().toString().padStart(2, '0');
+            return `${dateStr} ${hours}:${minutes}`;
+        }
+        
+        // 获取星期几
+        function getDayOfWeek(date) {
+            const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+            return days[new Date(date).getDay()];
+        }
+        
+        // 显示结果
+        function displayResults(summary, details, hasOvernightTasks) {
+            // 显示警告（如果有跨日任务）
+            warningAlert.style.display = hasOvernightTasks ? 'block' : 'none';
+            
+            // 清空表格
+            summaryTableBody.innerHTML = '';
+            detailTableBody.innerHTML = '';
+            
+            // 填充总表
+            summary.forEach((task, index) => {
+                const row = document.createElement('tr');
+                if (task.overnight) {
+                    row.classList.add('overnight');
+                }
+                
+                const startDate = new Date(task.startTime);
+                const endDate = new Date(task.endTime);
+                
+                row.innerHTML = `
+                    <td class="task-name">${task.name}</td>
+                    <td class="time-cell">${formatDateTime(task.startTime)}<br><small>${getDayOfWeek(startDate)}</small></td>
+                    <td class="time-cell">${formatDateTime(task.endTime)}<br><small>${getDayOfWeek(endDate)}</small></td>
+                    <td class="duration-cell">${task.totalHours.toFixed(1)}</td>
+                    <td>${task.overnight ? '📅 跨日' : '✅ 当日'}</td>
+                `;
+                
+                summaryTableBody.appendChild(row);
+            });
+            
+            // 填充拆分表
+            details.forEach((segment, index) => {
+                const row = document.createElement('tr');
+                if (segment.isWeekend) {
+                    row.classList.add('weekend');
+                }
+                
+                const dayOfWeek = getDayOfWeek(segment.segmentStart);
+                
+                row.innerHTML = `
+                    <td class="task-name">${segment.taskName}</td>
+                    <td>${segment.date}<br><small>${dayOfWeek}</small></td>
+                    <td>${segment.period}</td>
+                    <td class="time-cell">${formatDateTime(segment.segmentStart).split(' ')[1]} - ${formatDateTime(segment.segmentEnd).split(' ')[1]}</td>
+                    <td class="duration-cell">${segment.hours.toFixed(1)}</td>
+                `;
+                
+                detailTableBody.appendChild(row);
+            });
+            
+            // 计算统计信息
+            const firstTaskStart = summary[0]?.startTime;
+            const lastTaskEnd = summary[summary.length - 1]?.endTime;
+            const totalDays = Math.ceil((lastTaskEnd - firstTaskStart) / (1000 * 60 * 60 * 24));
+            const workDays = details.reduce((days, segment) => {
+                return days.add(segment.date);
+            }, new Set()).size;
+            
+            const totalHours = summary.reduce((sum, task) => sum + task.totalHours, 0);
+            
+            // 显示统计信息
+            timeInfo.innerHTML = `
+                <div>总任务数: <span class="tasks-count">${summary.length} 个</span></div>
+                <div>总耗时: <span class="work-hours">${totalHours.toFixed(1)} 小时</span></div>
+                <div>实际工作天数: <span class="total-days">${workDays} 天</span></div>
+                <div>排期跨度: <span class="total-days">${totalDays} 天</span></div>
+            `;
+            
+            // 显示结果区域
+            resultSection.classList.add('active');
+            
+            // 滚动到结果区域
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // 页面加载时加载示例
+        window.addEventListener('DOMContentLoaded', function() {
+            simpleTasksInput.value = exampleSimpleTasks;
+            simpleTasksInput.focus();
+        });
+        
+        // 输入框自动聚焦
+        simpleTasksInput.addEventListener('click', function() {
+            this.focus();
+        });
+        
+        tasksInput.addEventListener('click', function() {
+            this.focus();
+        });
+    </script>
 </body>
 </html>
