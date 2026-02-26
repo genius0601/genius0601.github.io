@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>个人任务排期工具（支持补班）</title>
+    <title>个人任务排期工具（总表格式可选）</title>
     <style>
         * {
             box-sizing: border-box;
@@ -74,7 +74,7 @@
             color: #2c3e50;
         }
         
-        input, textarea, button {
+        input, textarea, button, select {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid #ddd;
@@ -82,7 +82,7 @@
             font-size: 16px;
         }
         
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: #3498db;
             box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
@@ -388,6 +388,52 @@
             color: #7f8c8d;
             margin-top: 5px;
         }
+
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .toolbar-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .toolbar-section label {
+            margin-bottom: 0;
+            font-weight: normal;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+        
+        .toolbar-section input[type="radio"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .export-btn {
+            background-color: #27ae60;
+            width: auto;
+            padding: 8px 20px;
+            margin: 0;
+        }
+        
+        .export-btn:hover {
+            background-color: #229954;
+        }
         
         @media (max-width: 768px) {
             .split-layout {
@@ -406,14 +452,24 @@
             .work-time-display {
                 grid-template-columns: 1fr;
             }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .toolbar-section {
+                width: 100%;
+                justify-content: space-between;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>个人任务排期工具（支持补班）</h1>
-            <p class="subtitle">自动计算任务时间线 · 支持跨日跨段排期 · 补班日灵活配置</p>
+            <h1>个人任务排期工具（总表格式可选）</h1>
+            <p class="subtitle">自动计算任务时间线 · 支持跨日跨段排期 · 补班日灵活配置 · 一键导出Excel · 总表时间格式可选</p>
         </header>
         
         <!-- 任务输入区域 - 放在最上面 -->
@@ -564,6 +620,29 @@ ERP打印面单公共接口德邦特殊处理  2
         <!-- 结果区域 -->
         <div class="result-section" id="resultSection">
             <div class="card">
+                <!-- 合并工具栏：总表格式选择 + 导出 -->
+                <div class="toolbar">
+                    <div class="toolbar-section">
+                        <span style="font-weight: 600;">总表时间格式：</span>
+                        <label>
+                            <input type="radio" name="summaryFormat" value="date" checked> 年月日 (YYYY-MM-DD)
+                        </label>
+                        <label>
+                            <input type="radio" name="summaryFormat" value="datetime"> 年月日时分秒 (YYYY-MM-DD HH:mm:ss)
+                        </label>
+                    </div>
+                    <div class="toolbar-section">
+                        <span style="font-weight: 600;">导出时间格式：</span>
+                        <label>
+                            <input type="radio" name="exportFormat" value="date" checked> 年月日
+                        </label>
+                        <label>
+                            <input type="radio" name="exportFormat" value="datetime"> 年月日时分秒
+                        </label>
+                        <button type="button" id="exportBtn" class="export-btn">📥 导出Excel</button>
+                    </div>
+                </div>
+
                 <h2>📊 排期总表 (任务概览)</h2>
                 
                 <div id="warningAlert" class="alert warning" style="display: none;">
@@ -611,7 +690,7 @@ ERP打印面单公共接口德邦特殊处理  2
         </div>
         
         <footer>
-            <p>任务排期工具 v2.0 | 支持补班日配置 | 工作时间：周一至周五 09:00-12:00, 13:30-18:30（补班日同）</p>
+            <p>任务排期工具 v2.2 | 支持补班日配置 · 支持导出Excel · 总表时间格式可选 | 工作时间：周一至周五 09:00-12:00, 13:30-18:30（补班日同）</p>
         </footer>
     </div>
 
@@ -635,6 +714,7 @@ ERP打印面单公共接口德邦特殊处理  2
         const calculateBtn = document.getElementById('calculateBtn');
         const previewArea = document.getElementById('previewArea');
         const previewContent = document.getElementById('previewContent');
+        const exportBtn = document.getElementById('exportBtn');
         
         // 标签页元素
         const tabSimple = document.getElementById('tabSimple');
@@ -662,6 +742,17 @@ ERP打印面单公共接口德邦特殊处理  2
         const summaryTableBody = document.getElementById('summaryTableBody');
         const detailTableBody = document.getElementById('detailTableBody');
         const timeInfo = document.getElementById('timeInfo');
+        
+        // 总表时间格式单选按钮
+        const summaryFormatRadios = document.getElementsByName('summaryFormat');
+        
+        // 导出时间格式单选按钮
+        const exportFormatRadios = document.getElementsByName('exportFormat');
+        
+        // 存储当前排期结果，用于刷新和导出
+        let cachedSummary = [];
+        let cachedDetails = [];
+        let cachedHasOvernightTasks = false;
         
         // 初始化日期为今天
         const today = new Date();
@@ -967,14 +1058,40 @@ ERP打印面单公共接口德邦特殊处理  2
                 // 执行排期计算
                 const { summary, details, hasOvernightTasks } = calculateSchedule(tasks, currentTime);
                 
-                // 显示结果
-                displayResults(summary, details, hasOvernightTasks);
+                // 存储结果到缓存
+                cachedSummary = summary;
+                cachedDetails = details;
+                cachedHasOvernightTasks = hasOvernightTasks;
+                
+                // 显示结果（使用当前选中的总表格式）
+                refreshDisplay();
                 
             } catch (error) {
                 alert('输入格式错误: ' + error.message);
                 console.error(error);
             }
         });
+        
+        // 根据选中的总表格式刷新显示
+        function refreshDisplay() {
+            if (cachedSummary.length === 0) return;
+            
+            // 获取选中的总表格式
+            let summaryFormat = 'date';
+            for (let radio of summaryFormatRadios) {
+                if (radio.checked) {
+                    summaryFormat = radio.value;
+                    break;
+                }
+            }
+            
+            displayResults(cachedSummary, cachedDetails, cachedHasOvernightTasks, summaryFormat);
+        }
+        
+        // 为总表格式单选按钮添加事件监听
+        for (let radio of summaryFormatRadios) {
+            radio.addEventListener('change', refreshDisplay);
+        }
         
         // 调整时间到最近的工作时间（考虑补班）
         function adjustToWorkingTime(time) {
@@ -1147,13 +1264,21 @@ ERP打印面单公共接口德邦特殊处理  2
             return { summary, details, hasOvernightTasks };
         }
         
-        // 格式化日期时间显示
-        function formatDateTime(date) {
+        // 格式化日期时间显示（根据格式参数）
+        function formatDateTimeByFormat(date, format) {
             const d = new Date(date);
-            const dateStr = d.toISOString().split('T')[0];
+            const year = d.getFullYear();
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const day = d.getDate().toString().padStart(2, '0');
             const hours = d.getHours().toString().padStart(2, '0');
             const minutes = d.getMinutes().toString().padStart(2, '0');
-            return `${dateStr} ${hours}:${minutes}`;
+            const seconds = d.getSeconds().toString().padStart(2, '0');
+            
+            if (format === 'date') {
+                return `${year}-${month}-${day}`;
+            } else {
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+            }
         }
         
         // 获取星期几
@@ -1162,8 +1287,8 @@ ERP打印面单公共接口德邦特殊处理  2
             return days[new Date(date).getDay()];
         }
         
-        // 显示结果
-        function displayResults(summary, details, hasOvernightTasks) {
+        // 显示结果（接受格式参数）
+        function displayResults(summary, details, hasOvernightTasks, summaryFormat = 'date') {
             // 显示警告（如果有跨日任务）
             warningAlert.style.display = hasOvernightTasks ? 'block' : 'none';
             
@@ -1181,10 +1306,13 @@ ERP打印面单公共接口德邦特殊处理  2
                 const startDate = new Date(task.startTime);
                 const endDate = new Date(task.endTime);
                 
+                const startStr = formatDateTimeByFormat(task.startTime, summaryFormat);
+                const endStr = formatDateTimeByFormat(task.endTime, summaryFormat);
+                
                 row.innerHTML = `
                     <td class="task-name">${task.name}</td>
-                    <td class="time-cell">${formatDateTime(task.startTime)}<br><small>${getDayOfWeek(startDate)}</small></td>
-                    <td class="time-cell">${formatDateTime(task.endTime)}<br><small>${getDayOfWeek(endDate)}</small></td>
+                    <td class="time-cell">${startStr}<br><small>${getDayOfWeek(startDate)}</small></td>
+                    <td class="time-cell">${endStr}<br><small>${getDayOfWeek(endDate)}</small></td>
                     <td class="duration-cell">${task.totalHours.toFixed(1)}</td>
                     <td>${task.overnight ? '📅 跨日' : '✅ 当日'}</td>
                 `;
@@ -1192,7 +1320,7 @@ ERP打印面单公共接口德邦特殊处理  2
                 summaryTableBody.appendChild(row);
             });
             
-            // 填充拆分表
+            // 填充拆分表（拆分表时间格式固定为 HH:mm，不在此处修改）
             details.forEach((segment, index) => {
                 const row = document.createElement('tr');
                 if (segment.isWeekend) {
@@ -1201,11 +1329,18 @@ ERP打印面单公共接口德邦特殊处理  2
                 
                 const dayOfWeek = getDayOfWeek(segment.segmentStart);
                 
+                // 拆分表时间范围固定显示为 HH:mm - HH:mm（不带秒）
+                const startTimeStr = formatDateTimeByFormat(segment.segmentStart, 'datetime').split(' ')[1]; // 取 HH:mm:ss
+                const endTimeStr = formatDateTimeByFormat(segment.segmentEnd, 'datetime').split(' ')[1];
+                // 去掉秒，只保留 HH:mm
+                const startHM = startTimeStr.substring(0, 5);
+                const endHM = endTimeStr.substring(0, 5);
+                
                 row.innerHTML = `
                     <td class="task-name">${segment.taskName}</td>
                     <td>${segment.date}<br><small>${dayOfWeek}</small></td>
                     <td>${segment.period}</td>
-                    <td class="time-cell">${formatDateTime(segment.segmentStart).split(' ')[1]} - ${formatDateTime(segment.segmentEnd).split(' ')[1]}</td>
+                    <td class="time-cell">${startHM} - ${endHM}</td>
                     <td class="duration-cell">${segment.hours.toFixed(1)}</td>
                 `;
                 
@@ -1233,9 +1368,60 @@ ERP打印面单公共接口德邦特殊处理  2
             // 显示结果区域
             resultSection.classList.add('active');
             
-            // 滚动到结果区域
-            resultSection.scrollIntoView({ behavior: 'smooth' });
+            // 滚动到结果区域（但不要每次刷新都滚动，仅在第一次计算时滚动）
+            // 可以通过一个标记控制，但为了简单，我们只在计算时滚动，刷新不滚动
         }
+        
+        // 导出Excel
+        exportBtn.addEventListener('click', function() {
+            if (cachedSummary.length === 0) {
+                alert('请先计算排期，再导出数据。');
+                return;
+            }
+
+            // 获取选中的导出时间格式
+            let exportIncludeSeconds = false;
+            for (let radio of exportFormatRadios) {
+                if (radio.checked) {
+                    exportIncludeSeconds = (radio.value === 'datetime');
+                    break;
+                }
+            }
+
+            // 生成CSV内容
+            const headers = ['任务名称', '耗时(小时)', '开始时间', '结束时间'];
+            const rows = [];
+
+            cachedSummary.forEach(task => {
+                const startStr = formatDateTimeByFormat(task.startTime, exportIncludeSeconds ? 'datetime' : 'date');
+                const endStr = formatDateTimeByFormat(task.endTime, exportIncludeSeconds ? 'datetime' : 'date');
+                rows.push([task.name, task.totalHours.toFixed(1), startStr, endStr]);
+            });
+
+            // 构建CSV字符串
+            let csvContent = headers.join(',') + '\n';
+            rows.forEach(row => {
+                // 处理可能包含逗号的任务名称，用引号包裹
+                const escapedRow = row.map(cell => {
+                    if (typeof cell === 'string' && cell.includes(',')) {
+                        return `"${cell}"`;
+                    }
+                    return cell;
+                }).join(',');
+                csvContent += escapedRow + '\n';
+            });
+
+            // 创建Blob并下载
+            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' }); // 添加BOM处理中文
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.href = url;
+            link.setAttribute('download', '任务排期表.xls'); // 使用.xls后缀让Excel直接打开
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
         
         // 页面加载时加载示例
         window.addEventListener('DOMContentLoaded', function() {
